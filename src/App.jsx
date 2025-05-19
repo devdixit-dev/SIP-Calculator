@@ -5,8 +5,8 @@ const App = () => {
   const [amount, setAmount] = useState('');
   const [percent, setPercent] = useState('');
   const [tenure, setTenure] = useState('');
-  const [message, setMessage] = useState('')
-
+  const [message, setMessage] = useState('');
+  const [target, setTarget] = useState('monthly');
   const [futureValue, setFutureValue] = useState(0);
   const [amountDeposited, setAmountDeposited] = useState(0);
   const [showResults, setShowResults] = useState(false);
@@ -24,25 +24,43 @@ const App = () => {
     }
   };
 
+  const handleTargetChange = (value) => {
+    setTarget(value);
+    setAmount('');
+    setPercent('');
+    setTenure('');
+    setMessage('');
+    setShowResults(false);
+  };
+
   const handleSubmit = (e) => {
+    e.preventDefault();
+
     if (!amount || !percent || !tenure) {
-      e.preventDefault()
-      setMessage('All fields are required !!!')
-      setShowResults(false)
+      setMessage('All fields are required !!!');
+      setShowResults(false);
+      return;
     }
-    else {
-      setMessage('')
-      e.preventDefault()
-      const P = Number(amount);
-      const r = (percent / 100) / 12;
-      const n = tenure * 12;
 
-      const FV = Math.round(P * (((1 + r) ** n - 1) / r) * (1 + r));
+    setMessage('');
+    const P = Number(amount);
+    const r = (percent / 100) / 12;
+    const n = tenure * 12;
 
-      setFutureValue(FV);
-      setAmountDeposited(P * n);
-      setShowResults(true);
+    let FV = 0;
+    let totalInvested = 0;
+
+    if (target === 'monthly') {
+      FV = Math.round(P * (((1 + r) ** n - 1) / r) * (1 + r));
+      totalInvested = P * n;
+    } else if (target === 'lumpsum') {
+      FV = Math.round(P * (1 + r) ** n);
+      totalInvested = P;
     }
+
+    setFutureValue(FV);
+    setAmountDeposited(totalInvested);
+    setShowResults(true);
   };
 
   return (
@@ -62,16 +80,28 @@ const App = () => {
 
           <div className="mt-6">
             <p className="font-medium">Frequency of Investment</p>
-            <div className="flex gap-4 mt-2">
-              <p className="w-fit border-b-2 py-1 px-4 border-gray-400">Monthly</p>
-              {/* <p className="w-fit border-b-2 py-1 px-4 border-gray-400">Lumpsum</p> */}
+            <div className="flex gap-4 mt-4">
+              <p
+                className={`w-fit ${target === 'monthly' ? 'border-b-2' : ''} pb-1 px-4 border-gray-400 cursor-pointer`}
+                onClick={() => handleTargetChange('monthly')}
+              >
+                Monthly
+              </p>
+              <p
+                className={`w-fit ${target === 'lumpsum' ? 'border-b-2' : ''} pb-1 px-4 border-gray-400 cursor-pointer`}
+                onClick={() => handleTargetChange('lumpsum')}
+              >
+                Lumpsum
+              </p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
-                <p className="font-medium">Monthly Investment Amount</p>
+                <p className="font-medium">
+                  {target === 'monthly' ? 'Monthly Investment Amount' : 'Investment Amount'}
+                </p>
                 <input
                   className="w-full border py-3 px-4 border-gray-600 rounded outline-none mt-2"
                   type="number"
@@ -122,8 +152,7 @@ const App = () => {
 
           {/* Results */}
           <div
-            className={`mt-6 p-4 border-2 border-blue-500 rounded bg-blue-100 transition-all duration-300 ${showResults ? 'block' : 'hidden'
-              }`}
+            className={`mt-6 p-4 border-2 border-blue-500 rounded bg-blue-100 transition-all duration-300 ${showResults ? 'block' : 'hidden'}`}
           >
             <div className="text-md sm:text-base flex flex-col gap-2">
               <div className="flex gap-2">
