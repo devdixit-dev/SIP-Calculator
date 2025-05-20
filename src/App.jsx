@@ -54,7 +54,7 @@ const App = () => {
       FV = Math.round(P * (((1 + r) ** n - 1) / r) * (1 + r));
       totalInvested = P * n;
     } else if (target === 'lumpsum') {
-      FV = Math.round(P * (1 + r) * n);
+      FV = Math.round((P * 12) * (1 + r) * n);
       totalInvested = P;
     }
 
