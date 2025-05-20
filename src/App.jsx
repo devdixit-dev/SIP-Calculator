@@ -46,6 +46,7 @@ const App = () => {
     const P = Number(amount);
     const r = (percent / 100) / 12;
     const n = tenure * 12;
+    const year = tenure
 
     let FV = 0;
     let totalInvested = 0;
@@ -54,7 +55,7 @@ const App = () => {
       FV = Math.round(P * (((1 + r) ** n - 1) / r) * (1 + r));
       totalInvested = P * n;
     } else if (target === 'lumpsum') {
-      FV = Math.round(P * Math.pow(1 + r, n));
+      FV = Math.round(P * Math.pow(1 + r, year));
       totalInvested = P;
     }
 
